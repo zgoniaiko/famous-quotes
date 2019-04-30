@@ -92,6 +92,22 @@ class QuoteController extends AbstractFOSRestController
     }
 
     /**
+     * @Annotations\View()
+     *
+     * @param int $id
+     */
+    public function deleteQuoteAction(int $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $quote = $em->getRepository(Quote::class)->find($id);
+
+        $em->remove($quote);
+        $em->flush();
+
+        return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_NO_CONTENT));
+    }
+
+    /**
      * @param ObjectManager $em
      * @param string $name
      * @return Author
