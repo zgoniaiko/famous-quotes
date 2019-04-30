@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Author;
 use App\Entity\Quote;
+use Doctrine\Common\Persistence\ObjectManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,13 +48,7 @@ class QuoteController extends AbstractFOSRestController
         $data = json_decode($request->getContent(), true);
 
         $em = $this->getDoctrine()->getManager();
-        $author = $em->getRepository(Author::class)->findOneByName($data['author']);
-        if (!$author) {
-            $author = (new Author())
-                ->setName($data['author']);
-
-            $em->persist($author);
-        }
+        $author = $this->getAuthor($em, $data['author']);
 
         $quote = (new Quote())
             ->setAuthor($author)
@@ -76,13 +71,7 @@ class QuoteController extends AbstractFOSRestController
         $data = json_decode($request->getContent(), true);
 
         $em = $this->getDoctrine()->getManager();
-        $author = $em->getRepository(Author::class)->findOneByName($data['author']);
-        if (!$author) {
-            $author = (new Author())
-                ->setName($data['author']);
-
-            $em->persist($author);
-        }
+        $author = $this->getAuthor($em, $data['author']);
 
         $quote = $this->getDoctrine()->getRepository(Quote::class)->find($id);
         if (!$quote) {
@@ -100,5 +89,23 @@ class QuoteController extends AbstractFOSRestController
         $em->flush();
 
         return $this->handleView($this->view(['status' => 'ok'], $statusCode));
+    }
+
+    /**
+     * @param ObjectManager $em
+     * @param string $name
+     * @return Author
+     */
+    private function getAuthor(ObjectManager $em, string $name): Author
+    {
+        $author = $em->getRepository(Author::class)->findOneByName($name);
+        if (!$author) {
+            $author = (new Author())
+                ->setName($name);
+
+            $em->persist($author);
+        }
+
+        return $author;
     }
 }
