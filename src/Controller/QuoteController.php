@@ -24,7 +24,7 @@ class QuoteController extends AbstractFOSRestController
     /**
      * @Annotations\View(templateVar="quote")
      *
-     * @param type $id
+     * @param int $id
      */
     public function getQuoteAction($id)
     {
@@ -63,5 +63,42 @@ class QuoteController extends AbstractFOSRestController
         $em->flush();
 
         return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
+    }
+
+    /**
+     * @Annotations\View()
+     *
+     * @param Request $request
+     * @param int $id
+     */
+    public function putQuoteAction(Request $request, $id)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $em = $this->getDoctrine()->getManager();
+        $author = $em->getRepository(Author::class)->findOneByName($data['author']);
+        if (!$author) {
+            $author = (new Author())
+                ->setName($data['author']);
+
+            $em->persist($author);
+        }
+
+        $quote = $this->getDoctrine()->getRepository(Quote::class)->find($id);
+        if (!$quote) {
+            $quote = new Quote();
+
+            $statusCode = Response::HTTP_CREATED;
+        } else {
+            $statusCode = Response::HTTP_NO_CONTENT;
+        }
+        $quote
+            ->setAuthor($author)
+            ->setQuote($data['quote']);
+
+        $em->persist($quote);
+        $em->flush();
+
+        return $this->handleView($this->view(['status' => 'ok'], $statusCode));
     }
 }
