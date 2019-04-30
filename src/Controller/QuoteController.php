@@ -9,6 +9,16 @@ use FOS\RestBundle\Controller\Annotations;
 class QuoteController extends AbstractFOSRestController
 {
     /**
+     * @Annotations\View()
+     */
+    public function cgetQuotesAction()
+    {
+        $quotes = $this->getDoctrine()->getRepository(Quote::class)->findAll();
+
+        return $this->handleView($this->view($quotes));
+    }
+
+    /**
      * @Annotations\View(templateVar="quote")
      *
      * @param type $id
