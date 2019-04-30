@@ -24,6 +24,20 @@ class QuoteController extends AbstractFOSRestController
 
     /**
      * @Annotations\View(templateVar="quote")
+     */
+    public function getQuotesRandomAction()
+    {
+        $quote = $this->getDoctrine()->getRepository(Quote::class)->getOneRandom();
+
+        if (!$quote) {
+            throw $this->createNotFoundException('Quote does not exists');
+        }
+
+        return $this->handleView($this->view($quote));
+    }
+
+    /**
+     * @Annotations\View(templateVar="quote")
      *
      * @param int $id
      */
