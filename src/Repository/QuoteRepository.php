@@ -19,6 +19,16 @@ class QuoteRepository extends ServiceEntityRepository
         parent::__construct($registry, Quote::class);
     }
 
+    public function getOneRandom(): ?Quote
+    {
+        return  $this->createQueryBuilder('q')
+            ->addSelect('RAND() as HIDDEN rand')
+            ->addOrderBy('rand')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     // /**
     //  * @return Quote[] Returns an array of Quote objects
     //  */
