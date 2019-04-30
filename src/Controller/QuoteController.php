@@ -17,6 +17,10 @@ class QuoteController extends AbstractFOSRestController
     {
         $quote = $this->getDoctrine()->getRepository(Quote::class)->find($id);
 
+        if (!$quote) {
+            throw $this->createNotFoundException('Quote does not exists');
+        }
+
         return $this->handleView($this->view($quote));
     }
 }
