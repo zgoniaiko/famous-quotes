@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class QuoteControllerTest extends WebTestCase
 {
@@ -12,7 +13,7 @@ class QuoteControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', '/quotes');
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode());
         $response = $client->getResponse();
         $this->assertJson($response->getContent());
         $this->assertEquals('[]', $response->getContent());
@@ -35,7 +36,7 @@ class QuoteControllerTest extends WebTestCase
         $client->request('DELETE', '/quotes/1');
         $response = $client->getResponse();
 
-        $this->assertSame(204, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 
     protected function createQuote(Client $client, $quote, $author)
@@ -52,6 +53,6 @@ class QuoteControllerTest extends WebTestCase
             ])
         );
 
-        $this->assertSame(201, $client->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_CREATED, $client->getResponse()->getStatusCode());
     }
 }
