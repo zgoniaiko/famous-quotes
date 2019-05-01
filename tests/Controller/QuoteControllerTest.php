@@ -16,6 +16,9 @@ class QuoteControllerTest extends WebTestCase
 
         $this->createQuote($client, 'test quote', 'someone', Response::HTTP_UNAUTHORIZED);
 
+        $client->request('GET', '/quotes/1');
+        $this->assertSame(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
+
         $client->request(
             'PUT',
             '/quotes/1',
@@ -47,7 +50,7 @@ class QuoteControllerTest extends WebTestCase
     public function testNonExistQuote()
     {
         $client = $this->getClient(true);
-        $client->request('GET', '/quote/999');
+        $client->request('GET', '/quotes/999');
 
         $this->assertSame(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
     }
