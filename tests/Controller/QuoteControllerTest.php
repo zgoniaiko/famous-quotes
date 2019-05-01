@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class QuoteControllerTest extends WebTestCase
@@ -20,6 +21,15 @@ class QuoteControllerTest extends WebTestCase
     public function testPostShouldCreateQoute()
     {
         $client = static::createClient();
+        $this->createQuote($client, 'test quote', 'someone');
+
+        $response = $client->getResponse();
+        $this->assertJson($response->getContent());
+        $this->assertEquals('{"status":"ok"}', $response->getContent());
+    }
+
+    protected function createQuote(Client $client, $quote, $author)
+    {
         $client->request(
             'POST',
             '/quotes',
@@ -27,14 +37,11 @@ class QuoteControllerTest extends WebTestCase
             [],
             ['CONTENT_TYPE' => 'application/json'],
             \json_encode([
-                'quote' => 'test quote',
-                'author' => 'someone',
+                'quote' => $quote,
+                'author' => $author,
             ])
         );
 
         $this->assertSame(201, $client->getResponse()->getStatusCode());
-        $response = $client->getResponse();
-        $this->assertJson($response->getContent());
-        $this->assertEquals('{"status":"ok"}', $response->getContent());
     }
 }
