@@ -28,6 +28,16 @@ class QuoteControllerTest extends WebTestCase
         $this->assertEquals('{"status":"ok"}', $response->getContent());
     }
 
+    public function testDeleteQuote()
+    {
+        $client = static::createClient();
+
+        $client->request('DELETE', '/quotes/1');
+        $response = $client->getResponse();
+
+        $this->assertSame(204, $response->getStatusCode());
+    }
+
     protected function createQuote(Client $client, $quote, $author)
     {
         $client->request(
