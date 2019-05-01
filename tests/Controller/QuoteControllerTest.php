@@ -29,6 +29,45 @@ class QuoteControllerTest extends WebTestCase
         $this->assertEquals('{"status":"ok"}', $response->getContent());
     }
 
+    public function testPutShouldUpdateQoute()
+    {
+        $client = static::createClient();
+        $this->createQuote($client, 'test quote', 'someone');
+
+        $client->request(
+            'PUT',
+            '/quotes/1',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            \json_encode([
+                'quote' => 'updated quote',
+                'author' => 'someone',
+            ])
+        );
+
+        $this->assertSame(Response::HTTP_NO_CONTENT, $client->getResponse()->getStatusCode());
+    }
+
+    public function testPutShouldCreateQoute()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'PUT',
+            '/quotes/3',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            \json_encode([
+                'quote' => 'created quote',
+                'author' => 'someone',
+            ])
+        );
+
+        $this->assertSame(Response::HTTP_CREATED, $client->getResponse()->getStatusCode());
+    }
+
     public function testDeleteQuote()
     {
         $client = static::createClient();
