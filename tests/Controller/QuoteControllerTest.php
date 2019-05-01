@@ -8,12 +8,33 @@ use Symfony\Component\HttpFoundation\Response;
 
 class QuoteControllerTest extends WebTestCase
 {
-    public function testEmptyListOfQoutes()
+    public function testUnauthorizedAccess()
     {
         $client = $this->getClient();
         $client->request('GET', '/quotes');
         $this->assertSame(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
 
+        $this->createQuote($client, 'test quote', 'someone', Response::HTTP_UNAUTHORIZED);
+
+        $client->request(
+            'PUT',
+            '/quotes/1',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            \json_encode([
+                'quote' => 'updated quote',
+                'author' => 'someone',
+            ])
+        );
+        $this->assertSame(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
+
+        $client->request('DELETE', '/quotes/1');
+        $this->assertSame(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
+    }
+
+    public function testEmptyListOfQoutes()
+    {
         $client = $this->getClient(true);
         $client->request('GET', '/quotes');
 
@@ -25,9 +46,6 @@ class QuoteControllerTest extends WebTestCase
 
     public function testPostShouldCreateQoute()
     {
-        $client = $this->getClient();
-        $this->createQuote($client, 'test quote', 'someone', Response::HTTP_UNAUTHORIZED);
-
         $client = $this->getClient(true);
         $this->createQuote($client, 'test quote', 'someone');
 
