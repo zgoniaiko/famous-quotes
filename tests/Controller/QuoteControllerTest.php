@@ -10,7 +10,11 @@ class QuoteControllerTest extends WebTestCase
 {
     public function testEmptyListOfQoutes()
     {
-        $client = static::createClient();
+        $client = $this->getClient();
+        $client->request('GET', '/quotes');
+        $this->assertSame(Response::HTTP_UNAUTHORIZED, $client->getResponse()->getStatusCode());
+
+        $client = $this->getClient(true);
         $client->request('GET', '/quotes');
 
         $this->assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode());
@@ -21,7 +25,10 @@ class QuoteControllerTest extends WebTestCase
 
     public function testPostShouldCreateQoute()
     {
-        $client = static::createClient();
+        $client = $this->getClient();
+        $this->createQuote($client, 'test quote', 'someone', Response::HTTP_UNAUTHORIZED);
+
+        $client = $this->getClient(true);
         $this->createQuote($client, 'test quote', 'someone');
 
         $response = $client->getResponse();
@@ -31,7 +38,7 @@ class QuoteControllerTest extends WebTestCase
 
     public function testPutShouldUpdateQoute()
     {
-        $client = static::createClient();
+        $client = $this->getClient(true);
         $this->createQuote($client, 'test quote', 'someone');
 
         $client->request(
@@ -51,7 +58,7 @@ class QuoteControllerTest extends WebTestCase
 
     public function testPutShouldCreateQoute()
     {
-        $client = static::createClient();
+        $client = $this->getClient(true);
 
         $client->request(
             'PUT',
@@ -70,7 +77,7 @@ class QuoteControllerTest extends WebTestCase
 
     public function testDeleteQuote()
     {
-        $client = static::createClient();
+        $client = $this->getClient(true);
 
         $client->request('DELETE', '/quotes/1');
         $response = $client->getResponse();
@@ -78,7 +85,7 @@ class QuoteControllerTest extends WebTestCase
         $this->assertSame(Response::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 
-    protected function createQuote(Client $client, $quote, $author)
+    protected function createQuote(Client $client, $quote, $author, $status = Response::HTTP_CREATED)
     {
         $client->request(
             'POST',
@@ -92,6 +99,19 @@ class QuoteControllerTest extends WebTestCase
             ])
         );
 
-        $this->assertSame(Response::HTTP_CREATED, $client->getResponse()->getStatusCode());
+        $this->assertSame($status, $client->getResponse()->getStatusCode());
+    }
+
+    private function getClient($authenticated = false): Client
+    {
+        $params = [];
+        if ($authenticated) {
+            $params = array_merge($params, [
+                'PHP_AUTH_USER' => 'api',
+                'PHP_AUTH_PW'   => 'pass',
+            ]);
+        }
+
+        return static::createClient([], $params);
     }
 }
