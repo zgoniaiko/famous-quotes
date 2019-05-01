@@ -44,6 +44,14 @@ class QuoteControllerTest extends WebTestCase
         $this->assertEquals('[]', $response->getContent());
     }
 
+    public function testNonExistQuote()
+    {
+        $client = $this->getClient(true);
+        $client->request('GET', '/quote/999');
+
+        $this->assertSame(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
+    }
+
     public function testPostShouldCreateQoute()
     {
         $client = $this->getClient(true);
