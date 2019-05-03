@@ -9,7 +9,7 @@ use FOS\RestBundle\Controller\Annotations;
 class AuthorController extends AbstractFOSRestController
 {
     /**
-     * @Annotations\View(templateVar="quote")
+     * @Annotations\View(templateVar="author")
      *
      * @param int $id
      */
