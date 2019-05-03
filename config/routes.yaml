@@ -1,3 +1,7 @@
 quotes:
     type: rest
     resource: App\Controller\QuoteController
+
+authors:
+    type: rest
+    resource: App\Controller\AuthorController
